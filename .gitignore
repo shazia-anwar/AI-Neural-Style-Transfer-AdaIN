@@ -2,10 +2,10 @@
 coco/
 
 # Experiment subfolders
-experiment/big_dataset/
-experiment/trial/
-experiment/trial2/
-experiment/experiment2/
+experiment/'big_dataset'/
+experiment/'trial'/
+experiment/'trial2'/
+experiment/'experiment2'/
 
 # Python cache
 __pycache__/
