@@ -66,7 +66,7 @@ def style_transfer(content_image, style_image, encoder, decoder, alpha, device):
     # ])
     
     transform = transforms.Compose([
-        transforms.Resize((128, 128)),
+        transforms.Resize((64, 64)),
         transforms.ToTensor()
     ])
     
@@ -94,6 +94,8 @@ def save_image(image, path):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    print("Route Hit", flush=True)
+    print("Method:", request.method, flush=True)
     form = UploadForm()
     result_image = None
     content_filename = None
@@ -101,6 +103,7 @@ def index():
     error = None
     
     if form.validate_on_submit():
+        print("Form Submitted", flush=True)
         if form.content.data and form.content.data.filename:
             if allowed_file(form.content.data.filename):
                 content_filename = secure_filename(form.content.data.filename)
@@ -122,17 +125,32 @@ def index():
             style_path = os.path.join(app.config['UPLOAD_FOLDER'], style_filename)
             
             try:
+                print("Images loading...", flush=True)
+                
                 content_image = Image.open(content_path).convert('RGB')
                 style_image = Image.open(style_path).convert('RGB')
                 
+                print("Images loaded", flush=True)
+                
                 alpha = float(form.alpha.data)
+                
+                print("Transfer started", flush=True)
+                
                 stylized_image = style_transfer(content_image, style_image, encoder, decoder, alpha, device)
+                
+                print("Transfer completed", flush=True)
                 
                 result_filename = 'stylized_' + content_filename
                 result_path = os.path.join(app.config['UPLOAD_FOLDER'], result_filename)
+                
+                print("Saving image", flush=True)
+                
                 save_image(stylized_image, result_path)
                 
+                print("Saved successfully", flush=True)
+                
                 result_image = result_filename
+            
             except Exception as e:
                 print("ERROR:", e, flush=True)
                 error = str(e)
