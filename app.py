@@ -30,7 +30,8 @@ class UploadForm(FlaskForm):
     alpha = FloatField('Alpha', default=1.0)
     submit = SubmitField('Transfer Style')
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 encoder = VGGEncoder('vgg_normalised.pth').to(device)
 
@@ -65,7 +66,7 @@ def style_transfer(content_image, style_image, encoder, decoder, alpha, device):
     # ])
     
     transform = transforms.Compose([
-        transforms.Resize((256, 256)),
+        transforms.Resize((128, 128)),
         transforms.ToTensor()
     ])
     
@@ -133,6 +134,7 @@ def index():
                 
                 result_image = result_filename
             except Exception as e:
+                print("ERROR:", e, flush=True)
                 error = str(e)
     else:
         if not content_filename:
@@ -151,6 +153,9 @@ def send_image(filename):
 def send_example(filename):
     return send_from_directory('examples', filename)
 
+# if __name__ == '__main__':
+#     from werkzeug.serving import run_simple
+#     run_simple('localhost', 5000, app, use_reloader=True, use_debugger=True)
+
 if __name__ == '__main__':
-    from werkzeug.serving import run_simple
-    run_simple('localhost', 5000, app, use_reloader=True, use_debugger=True)
+    app.run(host="0.0.0.0", port=5000)
